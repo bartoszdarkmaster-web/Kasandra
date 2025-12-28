@@ -2,88 +2,102 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<title>Kassandra</title>
+<title>Kassandra – Decision Screen</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b0f14">
-<link rel="manifest" href="manifest.json">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
   --bg:#0b0f14;
   --panel:#121826;
   --panel2:#0f1420;
-  --accent:#00ffcc;
-  --danger:#ff3b3b;
-  --warn:#ffaa00;
   --text:#e6edf3;
   --muted:#8b949e;
+  --low:#4caf50;
+  --guarded:#9acd32;
+  --elevated:#ffaa00;
+  --high:#ff3b3b;
+  --critical:#ff0033;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
   background:var(--bg);
   color:var(--text);
+  font-family:system-ui,Segoe UI,Roboto,Arial;
 }
 header{
-  padding:18px 20px;
+  padding:16px 20px;
   border-bottom:1px solid #1f2636;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
 }
 header h1{
-  font-size:18px;
   margin:0;
+  font-size:18px;
   letter-spacing:.4px;
 }
 header small{
   color:var(--muted);
 }
-button{
-  background:var(--accent);
-  border:none;
-  padding:8px 14px;
-  border-radius:8px;
-  font-weight:700;
-}
 main{
-  padding:20px;
-  max-width:1100px;
+  max-width:900px;
   margin:auto;
-}
-.section{
-  margin-bottom:24px;
+  padding:24px 20px;
 }
 .panel{
   background:var(--panel);
   border:1px solid #1f2636;
-  border-radius:14px;
-  padding:18px;
+  border-radius:16px;
+  padding:24px;
 }
-.hero{
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:20px;
-}
-.hero .status{
-  font-size:46px;
+.risk{
+  font-size:56px;
   font-weight:900;
+  margin-bottom:6px;
 }
-.hero .status.danger{color:var(--danger)}
-.hero .explain{
-  margin-top:8px;
+.trend{
+  font-size:16px;
+  margin-bottom:16px;
+}
+.slider-wrap{
+  margin:20px 0;
+}
+.bar{
+  position:relative;
+  height:18px;
+  border-radius:10px;
+  background:linear-gradient(
+    to right,
+    var(--low) 0%,
+    var(--guarded) 30%,
+    var(--elevated) 50%,
+    var(--high) 70%,
+    var(--critical) 85%
+  );
+}
+.marker{
+  position:absolute;
+  top:-8px;
+  width:4px;
+  height:34px;
+  background:#fff;
+  border-radius:2px;
+}
+.scale{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
   color:var(--muted);
-  max-width:500px;
+  margin-top:6px;
+}
+.verdict{
+  font-size:18px;
+  line-height:1.4;
+  margin:20px 0;
 }
 .meta{
   display:flex;
   gap:16px;
-  margin-top:12px;
+  flex-wrap:wrap;
 }
 .meta div{
   background:var(--panel2);
@@ -91,103 +105,106 @@ main{
   border-radius:10px;
   font-size:14px;
 }
-h2{
-  margin:0 0 12px 0;
-  font-size:14px;
-  color:var(--muted);
-  letter-spacing:.5px;
+.actions{
+  margin-top:20px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
 }
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
+button{
+  background:#1f2636;
+  color:var(--text);
+  border:1px solid #2a3350;
+  padding:10px 16px;
+  border-radius:10px;
+  font-weight:700;
 }
-#map{height:320px;border-radius:12px}
 footer{
   text-align:center;
   color:var(--muted);
   font-size:11px;
   padding:16px;
 }
-.lang{cursor:pointer;margin-left:8px}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div>
-    <h1>KASSANDRA</h1>
-    <small>Strategic Early Warning System</small>
-  </div>
-  <div>
-    <span class="lang">🇵🇱</span>
-    <span class="lang">🇬🇧</span>
-    <button>UPDATE</button>
-  </div>
+  <h1>KASSANDRA</h1>
+  <small>Strategic Risk Decision Screen</small>
 </header>
 
 <main>
+<section class="panel">
 
-<section class="section panel hero">
-  <div>
-    <div class="status danger">HIGH</div>
-    <div class="explain">
-      Escalation pressure is increasing due to sustained logistics buildup,
-      medical infrastructure expansion and intensified troop movements.
+  <div id="riskLabel" class="risk">HIGH</div>
+  <div id="trendLabel" class="trend">↑ Trend wzrostowy (7 dni)</div>
+
+  <div class="slider-wrap">
+    <div class="bar">
+      <div id="marker" class="marker"></div>
     </div>
-    <div class="meta">
-      <div>Confidence: <b>0.78</b></div>
-      <div>Last update: <b>12:41 UTC</b></div>
+    <div class="scale">
+      <span>0.00</span><span>0.30</span><span>0.50</span><span>0.70</span><span>1.00</span>
     </div>
   </div>
-  <div>
-    <h2>Key Drivers</h2>
-    <ul>
-      <li>Troop concentration (+)</li>
-      <li>Fuel & ammo depots (+)</li>
-      <li>Hospital capacity (+)</li>
-      <li>Information warfare (+)</li>
-    </ul>
-  </div>
-</section>
 
-<section class="section grid">
-  <div class="panel">
-    <h2>Operational Map</h2>
-    <div id="map"></div>
+  <div id="verdict" class="verdict">
+    Ryzyko eskalacji rośnie. Wzrost napędzany jest zapleczem
+    logistycznym i infrastrukturą medyczną, a nie ruchami bojowymi.
   </div>
-  <div class="panel">
-    <h2>Escalation Trend</h2>
-    <canvas id="chart"></canvas>
-  </div>
-</section>
 
+  <div class="meta">
+    <div>CEPI: <b id="value">0.78</b></div>
+    <div>Zmiana 7d: <b>+0.08</b></div>
+    <div>Confidence: <b>0.78</b></div>
+    <div>Aktualizacja: <b id="time">—</b></div>
+  </div>
+
+  <div class="actions">
+    <button>DLACZEGO?</button>
+    <button>CO SIĘ ZMIENIŁO</button>
+    <button>ANALYSIS MODE</button>
+  </div>
+
+</section>
 </main>
 
 <footer>
-  Internal analytical tool · Kassandra v2
+  Internal analytical tool · Kassandra · Decision UI
 </footer>
 
 <script>
-const map=L.map("map").setView([50.5,30.5],6);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-[[52.2,21],[50.3,23],[49.8,24],[53,27.5]].forEach(c=>{
-  L.circleMarker(c,{radius:7,color:"#ff3b3b",fillOpacity:.8}).addTo(map);
-});
+/* ===== MODEL ===== */
+const cepi = 0.78;        // aktualna wartość
+const delta7 = 0.08;      // zmiana 7 dni
 
-new Chart(document.getElementById("chart"),{
-  type:"line",
-  data:{
-    labels:["-7","-6","-5","-4","-3","-2","-1","Now"],
-    datasets:[{
-      data:[0.42,0.45,0.5,0.56,0.63,0.71,0.78,0.84],
-      borderColor:"#ff3b3b",
-      tension:.4
-    }]
-  },
-  options:{plugins:{legend:{display:false}},scales:{y:{min:0,max:1}}}
-});
+/* ===== STREFY ===== */
+function getZone(v){
+  if(v<0.30) return ["LOW","var(--low)"];
+  if(v<0.50) return ["GUARDED","var(--guarded)"];
+  if(v<0.70) return ["ELEVATED","var(--elevated)"];
+  if(v<0.85) return ["HIGH","var(--high)"];
+  return ["CRITICAL","var(--critical)"];
+}
+
+/* ===== TREND ===== */
+function getTrend(d){
+  if(d>=0.03) return "↑ Trend wzrostowy (7 dni)";
+  if(d<=-0.03) return "↓ Trend spadkowy (7 dni)";
+  return "→ Trend stabilny (7 dni)";
+}
+
+/* ===== RENDER ===== */
+const zone = getZone(cepi);
+document.getElementById("riskLabel").innerText = zone[0];
+document.getElementById("riskLabel").style.color = `var(${zone[1]})`;
+document.getElementById("trendLabel").innerText = getTrend(delta7);
+document.getElementById("value").innerText = cepi.toFixed(2);
+document.getElementById("marker").style.left = (cepi*100)+"%";
+document.getElementById("time").innerText =
+  new Date().toISOString().slice(11,19);
 </script>
 
 </body>
