@@ -3,13 +3,165 @@
 <head>
   <meta charset="utf-8">
   <title>Kassandra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#121826;
+      --accent:#00ffcc;
+      --danger:#ff3b3b;
+      --text:#e6edf3;
+      --muted:#8b949e;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:16px;
+      border-bottom:1px solid #1f2636;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.5px;
+    }
+    button{
+      background:var(--accent);
+      color:#000;
+      border:none;
+      padding:8px 14px;
+      font-weight:600;
+      border-radius:6px;
+    }
+    main{
+      padding:16px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+    }
+    .card{
+      background:var(--panel);
+      padding:14px;
+      border-radius:10px;
+      border:1px solid #1f2636;
+    }
+    .card h2{
+      margin:0 0 8px 0;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .value{
+      font-size:26px;
+      font-weight:700;
+    }
+    .danger{color:var(--danger)}
+    .accent{color:var(--accent)}
+    .small{
+      font-size:12px;
+      color:var(--muted);
+    }
+    footer{
+      padding:12px;
+      text-align:center;
+      font-size:11px;
+      color:var(--muted);
+    }
+  </style>
 </head>
-  <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/Kasandra/sw.js");
-  </script>
+
 <body>
-  <h1>Kassandra działa v2</h1>
-  <p>To jest test aplikacji web / Android.</p>
+<header>
+  <h1>KASSANDRA · Strategic Early Warning</h1>
+  <button onclick="updateData()">UPDATE</button>
+</header>
+
+<main>
+
+  <!-- GLOBAL STATUS -->
+  <section class="grid">
+    <div class="card">
+      <h2>Global Threat Level</h2>
+      <div id="threat" class="value danger">HIGH</div>
+      <div class="small">Composite risk score</div>
+    </div>
+
+    <div class="card">
+      <h2>Confidence Index</h2>
+      <div id="confidence" class="value accent">0.74</div>
+      <div class="small">Data reliability</div>
+    </div>
+
+    <div class="card">
+      <h2>Last Update</h2>
+      <div id="lastUpdate" class="value">—</div>
+      <div class="small">UTC</div>
+    </div>
+  </section>
+
+  <!-- VARIABLES -->
+  <section class="card">
+    <h2>Key Variables (weights)</h2>
+    <ul class="small">
+      <li>Troop movements — 0.30</li>
+      <li>Logistics & fuel — 0.20</li>
+      <li>Hospitals / bunkers — 0.15</li>
+      <li>Ammo depots — 0.15</li>
+      <li>Political signaling — 0.10</li>
+      <li>Information warfare — 0.10</li>
+    </ul>
+  </section>
+
+  <!-- MAP PLACEHOLDER -->
+  <section class="card">
+    <h2>Operational Map</h2>
+    <div class="small">[ map module placeholder — satellite / OSINT layers ]</div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="card">
+    <h2>Timeline</h2>
+    <div class="small">
+      • T-30: increased logistics activity<br>
+      • T-14: hospital capacity expansion<br>
+      • T-7: fuel depot reinforcement
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Kassandra · internal analytical system · build v1
+</footer>
+
+<script>
+  function updateData(){
+    const now = new Date().toISOString();
+    document.getElementById("lastUpdate").innerText = now.slice(11,19);
+    document.getElementById("confidence").innerText =
+      (0.65 + Math.random()*0.2).toFixed(2);
+  }
+
+  // initial load
+  updateData();
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/Kasandra/sw.js");
+  }
+</script>
 </body>
 </html>
