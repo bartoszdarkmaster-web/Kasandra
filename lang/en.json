@@ -1,0 +1,23 @@
+{
+  "overview": "OVERVIEW",
+  "map": "MAP",
+  "drivers": "DRIVERS",
+  "timeline": "TIMELINE",
+  "scenarios": "SCENARIOS",
+
+  "status_high": "HIGH RISK",
+  "update_now": "UPDATE NOW",
+
+  "key_changes": "Key changes (7 days)",
+  "attention_points": "Points requiring attention",
+
+  "military": "Military concentration",
+  "logistics": "Fuel & ammo logistics",
+  "medical": "Medical infrastructure",
+  "information": "Information domain",
+
+  "global_map": "Global operational map",
+  "drivers_title": "Escalation drivers",
+  "timeline_title": "Escalation timeline",
+  "scenarios_title": "Scenarios"
+}
