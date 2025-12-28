@@ -1,56 +1,182 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KASSANDRA – Strategic Early Warning</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+<title>KASSANDRA – Global Strategic Early Warning</title>
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="style.css">
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body>
 
-<header>
+<header class="top">
   <h1>KASSANDRA</h1>
-  <p>Strategic Early Warning System</p>
+  <p>Global Strategic Early Warning System</p>
 </header>
 
-<section class="card">
-  <h2 class="risk high">HIGH</h2>
+<nav class="tabs">
+  <button onclick="showTab('overview')" class="active">OVERVIEW</button>
+  <button onclick="showTab('map')">MAP</button>
+  <button onclick="showTab('drivers')">DRIVERS</button>
+  <button onclick="showTab('timeline')">TIMELINE</button>
+  <button onclick="showTab('scenarios')">SCENARIOS</button>
+</nav>
 
-  <div class="bar">
-    <div class="fill"></div>
+<main>
+
+<!-- ================= OVERVIEW ================= -->
+<section id="overview" class="tab active">
+
+  <div class="card hero">
+    <div class="status">HIGH</div>
+
+    <div class="bar">
+      <div class="fill"></div>
+    </div>
+
+    <div class="stats">
+      <div>CEPI: <b>0.78</b></div>
+      <div>Δ 7d: <span class="up">+0.08 ▲</span></div>
+      <div>Confidence: <b>0.78</b></div>
+      <div>Update: <b id="time">--:--</b></div>
+    </div>
+
+    <button onclick="update()">UPDATE NOW</button>
   </div>
 
-  <div class="metrics">
-    <div>CEPI: <b id="cepi">0.78</b></div>
-    <div>Δ 7d: <b class="up">+0.08 ▲</b></div>
-    <div>Confidence: <b>0.78</b></div>
-    <div>Update: <b id="time">--:--</b></div>
+  <div class="card">
+    <h3>Kluczowe zmiany (7 dni)</h3>
+    <ul>
+      <li>↑ Military concentration (Eurasia)</li>
+      <li>↑ Fuel & ammo logistics</li>
+      <li>↑ Medical infrastructure</li>
+      <li>↓ No mass mobilization detected</li>
+    </ul>
   </div>
 
-  <button onclick="updateSystem()">UPDATE NOW</button>
+  <div class="card">
+    <h3>Global Attention Points</h3>
+    <ul>
+      <li>⚠ Eastern Europe – logistics surge</li>
+      <li>⚠ Middle East – force posture shift</li>
+      <li>ℹ Indo-Pacific – stable</li>
+    </ul>
+  </div>
+
 </section>
 
-<section class="card">
-  <h3>DLACZEGO?</h3>
-  <ul id="reasons"></ul>
+<!-- ================= MAP ================= -->
+<section id="map" class="tab">
+  <div class="card">
+    <h3>Global Operational Map</h3>
+    <div id="mapContainer"></div>
+  </div>
 </section>
 
-<section class="card">
-  <h3>Mapa operacyjna</h3>
-  <div id="map"></div>
+<!-- ================= DRIVERS ================= -->
+<section id="drivers" class="tab">
+
+  <div class="card">
+    <h3>Military Posture</h3>
+    <p>Trend: ↑ | Impact: +0.12 | Confidence: 0.81</p>
+    <p>Regions: Eastern Europe, Western Russia</p>
+  </div>
+
+  <div class="card">
+    <h3>Logistics & Fuel</h3>
+    <p>Trend: ↑ | Impact: +0.08 | Confidence: 0.77</p>
+    <p>Rail traffic, fuel depots, transport intensity</p>
+  </div>
+
+  <div class="card">
+    <h3>Medical & Civil Defense</h3>
+    <p>Trend: ↑ | Impact: +0.06 | Confidence: 0.74</p>
+    <p>Field hospitals, evacuation readiness</p>
+  </div>
+
+  <div class="card">
+    <h3>Information Domain</h3>
+    <p>Trend: → | Impact: +0.02 | Confidence: 0.69</p>
+    <p>Rhetoric, narratives, internal signaling</p>
+  </div>
+
 </section>
+
+<!-- ================= TIMELINE ================= -->
+<section id="timeline" class="tab">
+  <div class="card">
+    <h3>Escalation Timeline</h3>
+    <p>CEPI trend over time (7 / 30 / 90 days)</p>
+    <p>[ tutaj wykres ]</p>
+  </div>
+</section>
+
+<!-- ================= SCENARIOS ================= -->
+<section id="scenarios" class="tab">
+
+  <div class="card red">
+    <h3>Kinetic Escalation</h3>
+    <p>Probability: 22%</p>
+    <p>Triggers: mobilization, air posture change</p>
+  </div>
+
+  <div class="card orange">
+    <h3>Hybrid Pressure</h3>
+    <p>Probability: 46%</p>
+    <p>Logistics + information operations</p>
+  </div>
+
+  <div class="card green">
+    <h3>De-escalation</h3>
+    <p>Probability: 32%</p>
+    <p>Logistics slowdown, political signaling</p>
+  </div>
+
+</section>
+
+</main>
 
 <footer>
-  Internal analytical tool · KASSANDRA
+  Internal analytical system · KASSANDRA
 </footer>
 
-<script src="app.js"></script>
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function update() {
+  document.getElementById('time').innerText =
+    new Date().toLocaleTimeString();
+}
+
+// MAP
+const map = L.map('mapContainer').setView([40, 20], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+[
+  {lat: 52, lon: 27, label: "Logistics surge"},
+  {lat: 55, lon: 37, label: "Command center"},
+  {lat: 35, lon: 36, label: "Force posture shift"}
+].forEach(p => {
+  L.circleMarker([p.lat, p.lon], {
+    radius: 8,
+    color: "#ff4d4d",
+    fillOpacity: 0.8
+  }).addTo(map).bindPopup(p.label);
+});
+
+update();
+</script>
+
 </body>
 </html>
