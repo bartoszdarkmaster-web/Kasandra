@@ -1,229 +1,241 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KASSANDRA – Strategic Risk</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KASSANDRA – Strategic Risk System</title>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 :root {
-  --bg:#0b0f17;
-  --card:#121826;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --red:#ef4444;
-  --green:#22c55e;
-  --yellow:#f59e0b;
+  --bg: #0b0f17;
+  --card: #121826;
+  --accent: #ff3b3b;
+  --green: #2ecc71;
+  --yellow: #f1c40f;
+  --text: #e6e8ef;
+  --muted: #9aa4bf;
 }
 
+* { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
 body {
-  margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  margin: 0;
+  background: radial-gradient(circle at top, #10162a, #05070d);
+  color: var(--text);
 }
 
-.container {
-  padding:16px;
-  max-width:480px;
-  margin:auto;
+header {
+  padding: 20px;
+  border-bottom: 1px solid #1d2440;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
+.sub { color: var(--muted); font-size: 13px; }
+
+button {
+  background: #1b2340;
+  color: var(--text);
+  border: 1px solid #2a3570;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover { background: #243060; }
+
+main {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
 
 .card {
-  background:var(--card);
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
-  margin-bottom:16px;
+  background: linear-gradient(180deg, #141b2e, #0d1324);
+  border: 1px solid #1e2750;
+  border-radius: 14px;
+  padding: 16px;
 }
 
-h1 {
-  margin:0 0 4px;
-  font-size:20px;
-  letter-spacing:.05em;
+.risk {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent);
 }
 
-.subtitle {
-  color:var(--muted);
-  font-size:13px;
-  margin-bottom:12px;
+.scale {
+  height: 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--green), var(--yellow), var(--accent));
+  position: relative;
+  margin: 10px 0;
 }
-
-.level {
-  font-size:42px;
-  font-weight:800;
-  color:var(--red);
-}
-
-.bar {
-  height:10px;
-  border-radius:6px;
-  background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);
-  margin:12px 0;
-  position:relative;
-}
-
-.bar::after {
-  content:"";
-  position:absolute;
-  top:-4px;
-  left:72%;
-  width:4px;
-  height:18px;
-  background:#fff;
-  border-radius:2px;
-}
-
-.desc {
-  font-size:14px;
-  line-height:1.4;
-  margin-bottom:12px;
+.marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 20px;
+  background: #fff;
 }
 
 .meta {
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  font-size:13px;
-  color:var(--muted);
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.meta div {
+  background: #0c1225;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
 }
 
-/* === IMPACT LIST === */
+.drivers li {
+  list-style: none;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.up { color: var(--accent); }
+.down { color: var(--green); }
 
-.section-title {
-  font-size:14px;
-  letter-spacing:.08em;
-  color:var(--muted);
-  margin-bottom:8px;
+#map {
+  height: 260px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.impact {
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  padding:10px 0;
-  border-bottom:1px solid #1f2937;
-}
+canvas { width: 100%; height: 200px; }
 
-.impact:last-child { border-bottom:none; }
-
-.delta {
-  font-weight:700;
-  min-width:56px;
-}
-
-.up { color:var(--red); }
-.down { color:var(--green); }
-
-.arrow {
-  font-size:18px;
-  margin-right:4px;
-}
-
-.impact-text {
-  font-size:14px;
-  line-height:1.3;
-}
-
-small {
-  color:var(--muted);
-  font-size:12px;
-}
-
-/* buttons */
-
-.actions {
-  display:flex;
-  gap:12px;
-  margin-top:12px;
-}
-
-button {
-  flex:1;
-  background:#1f2937;
-  color:#fff;
-  border:none;
-  padding:10px;
-  border-radius:10px;
-  font-weight:600;
+footer {
+  text-align: center;
+  padding: 10px;
+  font-size: 11px;
+  color: var(--muted);
 }
 </style>
 </head>
 
 <body>
-<div class="container">
 
-  <!-- HEADER -->
-  <div class="card">
+<header>
+  <div>
     <h1>KASSANDRA</h1>
-    <div class="subtitle">Strategic Risk · Decision Mode</div>
-
-    <div class="level">HIGH</div>
-
-    <div class="bar"></div>
-
-    <div class="desc">
-      Presja eskalacyjna rośnie. Wzrost napędzany zapleczem logistycznym
-      i infrastrukturą medyczną. Brak potwierdzonych ruchów bojowych.
-    </div>
-
-    <div class="meta">
-      <div>CEPI: <b>0.78</b></div>
-      <div>Zmiana 7d: <b>+0.08</b></div>
-      <div>Aktualizacja: <b>20:55</b></div>
-    </div>
+    <div class="sub" id="subtitle">Strategiczna Ocena Ryzyka</div>
   </div>
-
-  <!-- WHAT IMPACTED -->
-  <div class="card">
-    <div class="section-title">CO WPŁYNĘŁO NA OCENĘ (7 DNI)</div>
-
-    <div class="impact">
-      <div class="delta up">
-        <span class="arrow">▲</span>+0.03
-      </div>
-      <div class="impact-text">
-        Zwiększenie transportów paliwa<br>
-        <small>kolej + transport kołowy</small>
-      </div>
-    </div>
-
-    <div class="impact">
-      <div class="delta up">
-        <span class="arrow">▲</span>+0.02
-      </div>
-      <div class="impact-text">
-        Rozbudowa zaplecza medycznego<br>
-        <small>szpitale polowe, infrastruktura</small>
-      </div>
-    </div>
-
-    <div class="impact">
-      <div class="delta up">
-        <span class="arrow">▲</span>+0.01
-      </div>
-      <div class="impact-text">
-        Nowe magazyny amunicji<br>
-        <small>logistyka zaplecza</small>
-      </div>
-    </div>
-
-    <div class="impact">
-      <div class="delta down">
-        <span class="arrow">▼</span>0.00
-      </div>
-      <div class="impact-text">
-        Brak potwierdzonych ruchów bojowych<br>
-        <small>brak mobilizacji jawnej</small>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button>DLACZEGO?</button>
-      <button>ANALYSIS MODE</button>
-    </div>
+  <div>
+    <button onclick="toggleLang()">🇵🇱 / 🇬🇧</button>
+    <button onclick="updateNow()">UPDATE NOW</button>
   </div>
+</header>
 
+<main>
+
+<!-- RISK -->
+<div class="card">
+  <div class="risk" id="riskLabel">HIGH</div>
+  <div class="scale">
+    <div class="marker" id="marker" style="left:78%"></div>
+  </div>
+  <p id="riskDesc">
+    Presja eskalacyjna rośnie z powodu zaplecza logistycznego i infrastruktury medycznej.
+  </p>
+
+  <div class="meta">
+    <div>CEPI<br><b id="cepi">0.78</b></div>
+    <div>Δ 7d<br><b class="up">+0.08</b></div>
+    <div>Confidence<br><b>0.78</b></div>
+    <div>Update<br><b id="time">--:--</b></div>
+  </div>
 </div>
+
+<!-- DRIVERS -->
+<div class="card">
+  <h3>Key Drivers</h3>
+  <ul class="drivers">
+    <li><span>🛢 Logistyka paliw</span><span class="up">▲ +0.03</span></li>
+    <li><span>🏥 Szpitale polowe</span><span class="up">▲ +0.02</span></li>
+    <li><span>📡 Operacje informacyjne</span><span class="up">▲ +0.01</span></li>
+    <li><span>🪖 Mobilizacja wojsk</span><span class="down">▼ -0.01</span></li>
+  </ul>
+</div>
+
+<!-- MAP -->
+<div class="card">
+  <h3>Operational Map</h3>
+  <div id="map"></div>
+</div>
+
+<!-- TREND -->
+<div class="card">
+  <h3>Escalation Trend (7d)</h3>
+  <canvas id="trend"></canvas>
+</div>
+
+</main>
+
+<footer>
+  Internal analytical system · KASSANDRA
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let lang = "pl";
+
+const texts = {
+  pl: {
+    subtitle: "Strategiczna Ocena Ryzyka",
+    desc: "Presja eskalacyjna rośnie z powodu zaplecza logistycznego i infrastruktury medycznej."
+  },
+  en: {
+    subtitle: "Strategic Risk Assessment",
+    desc: "Escalation pressure increases due to logistics buildup and medical infrastructure."
+  }
+};
+
+function toggleLang(){
+  lang = lang === "pl" ? "en" : "pl";
+  document.getElementById("subtitle").innerText = texts[lang].subtitle;
+  document.getElementById("riskDesc").innerText = texts[lang].desc;
+}
+
+function updateNow(){
+  const v = (Math.random()*0.1+0.7).toFixed(2);
+  document.getElementById("cepi").innerText = v;
+  document.getElementById("marker").style.left = (v*100)+"%";
+  document.getElementById("time").innerText = new Date().toLocaleTimeString();
+}
+
+document.getElementById("time").innerText = new Date().toLocaleTimeString();
+
+/* MAP */
+const map = L.map('map').setView([50.45,30.52],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+L.marker([50.45,30.52]).addTo(map).bindPopup("Logistyka / Medyczne");
+
+/* CHART */
+new Chart(document.getElementById("trend"),{
+  type:"line",
+  data:{
+    labels:["-7","-6","-5","-4","-3","-2","-1"],
+    datasets:[{
+      data:[0.42,0.44,0.47,0.5,0.54,0.58,0.62],
+      borderColor:"#ff3b3b",
+      tension:0.4
+    }]
+  },
+  options:{plugins:{legend:{display:false}}}
+});
+</script>
+
 </body>
 </html>
