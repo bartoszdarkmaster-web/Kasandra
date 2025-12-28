@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0b0f14"/>
+  <circle cx="256" cy="256" r="200" stroke="#00ffcc" stroke-width="6" fill="none"/>
+  <circle cx="256" cy="256" r="140" stroke="#00ffcc" stroke-width="3" fill="none"/>
+  <circle cx="256" cy="256" r="80" stroke="#00ffcc" stroke-width="2" fill="none"/>
+
+  <line x1="256" y1="256" x2="420" y2="180"
+        stroke="#00ffcc" stroke-width="4"/>
+
+  <circle cx="420" cy="180" r="6" fill="#ff3b3b"/>
+  <circle cx="310" cy="210" r="4" fill="#ffaa00"/>
+  <circle cx="190" cy="300" r="4" fill="#ffaa00"/>
+
+  <text x="256" y="460"
+        text-anchor="middle"
+        font-size="28"
+        fill="#6f7a85"
+        font-family="Arial, Helvetica, sans-serif">
+    KASSANDRA
+  </text>
+</svg>
