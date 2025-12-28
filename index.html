@@ -11,24 +11,24 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
-<body>
+<body class="analysis-only">
 
 <header class="top">
   <h1>KASSANDRA</h1>
   <p>Global Strategic Early Warning System</p>
 
-  <div class="lang-switch">
-    <button onclick="setLang('pl')">🇵🇱</button>
-    <button onclick="setLang('en')">🇬🇧</button>
+  <div class="mode-switch">
+    <button id="mode-analysis" class="active" onclick="setMode('analysis')">ANALYSIS</button>
+    <button id="mode-explain" onclick="setMode('explain')">EXPLAIN</button>
   </div>
 </header>
 
 <nav class="tabs">
-  <button class="active" onclick="showTab('overview')" data-i18n="overview">OVERVIEW</button>
-  <button onclick="showTab('map')" data-i18n="map">MAP</button>
-  <button onclick="showTab('drivers')" data-i18n="drivers">DRIVERS</button>
-  <button onclick="showTab('timeline')" data-i18n="timeline">TIMELINE</button>
-  <button onclick="showTab('scenarios')" data-i18n="scenarios">SCENARIOS</button>
+  <button class="active" onclick="showTab('overview')">OVERVIEW</button>
+  <button onclick="showTab('map')">MAP</button>
+  <button onclick="showTab('drivers')">DRIVERS</button>
+  <button onclick="showTab('timeline')">TIMELINE</button>
+  <button onclick="showTab('scenarios')">SCENARIOS</button>
 </nav>
 
 <main>
@@ -37,74 +37,66 @@
   <div class="card hero">
     <div class="status">HIGH</div>
 
-    <div class="bar">
-      <div class="fill"></div>
-    </div>
+    <div class="bar"><div class="fill"></div></div>
 
     <div class="stats">
       <div>CEPI: <b id="cepi">--</b></div>
-      <div>Δ 7d: <span class="up">▲</span></div>
+      <div>Trend 7d: ▲</div>
       <div>Confidence: <b>0.78</b></div>
       <div>Update: <b id="time">--:--</b></div>
     </div>
 
-    <button onclick="updateSystem()" data-i18n="update_now">UPDATE NOW</button>
-  </div>
-
-  <div class="card">
-    <h3 data-i18n="key_changes">Kluczowe zmiany (7 dni)</h3>
-    <ul>
-      <li>↑ Military concentration</li>
-      <li>↑ Logistics activity</li>
-      <li>↑ Medical readiness</li>
-      <li>↓ No mass mobilization</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h3 data-i18n="attention_points">Punkty wymagające uwagi</h3>
-    <ul>
-      <li>⚠ Eastern Europe – logistics surge</li>
-      <li>⚠ Middle East – force posture shift</li>
-      <li>ℹ Indo-Pacific – stable</li>
-    </ul>
+    <button onclick="updateSystem()">UPDATE NOW</button>
   </div>
 </section>
 
 <section id="map" class="tab">
   <div class="card">
-    <h3 data-i18n="global_map">Globalna mapa operacyjna</h3>
+    <h3>Global Operational Map</h3>
     <div id="mapContainer"></div>
   </div>
 </section>
 
 <section id="drivers" class="tab">
-  <div class="card">
+
+  <div class="card driver">
     <h3>Military Posture</h3>
-    <p>Trend: ↑ | Impact: +0.12 | Confidence: 0.81</p>
+    <p class="summary">Impact: +0.12 · Confidence: 0.81</p>
+    <button onclick="toggleDriver(this)">Rozwiń</button>
+    <div class="details">
+      <ul class="events"></ul>
+      <p class="why analysis">
+        Wzrost koncentracji wojsk i rotacji zwiększa gotowość operacyjną.
+      </p>
+      <p class="why explain">
+        Gdy wojsko się przemieszcza i ćwiczy, łatwiej podjąć szybkie działania.
+      </p>
+    </div>
   </div>
 
-  <div class="card">
+  <div class="card driver">
     <h3>Logistics</h3>
-    <p>Trend: ↑ | Impact: +0.08 | Confidence: 0.77</p>
+    <p class="summary">Impact: +0.08 · Confidence: 0.77</p>
+    <button onclick="toggleDriver(this)">Rozwiń</button>
+    <div class="details">
+      <ul class="events"></ul>
+      <p class="why analysis">
+        Logistyka determinuje tempo i czas trwania operacji.
+      </p>
+      <p class="why explain">
+        Bez paliwa i transportu wojsko nie może długo działać.
+      </p>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>Medical & Civil Defense</h3>
-    <p>Trend: ↑ | Impact: +0.06 | Confidence: 0.74</p>
-  </div>
-
-  <div class="card">
-    <h3>Information Domain</h3>
-    <p>Trend: → | Impact: +0.02 | Confidence: 0.69</p>
-  </div>
 </section>
 
 <section id="timeline" class="tab">
   <div class="card">
-    <h3 data-i18n="timeline_title">Escalation Timeline</h3>
+    <h3>Escalation Timeline</h3>
     <canvas id="timelineCanvas" style="width:100%"></canvas>
   </div>
+  <div id="timelineNotes" class="card muted"></div>
 </section>
 
 <section id="scenarios" class="tab">
