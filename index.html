@@ -6,7 +6,6 @@
 <title>KASSANDRA – Global Strategic Early Warning</title>
 
 <link rel="stylesheet" href="style.css">
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
@@ -20,6 +19,7 @@
   <div class="mode-switch">
     <button id="mode-analysis" class="active" onclick="setMode('analysis')">ANALYSIS</button>
     <button id="mode-explain" onclick="setMode('explain')">EXPLAIN</button>
+    <button id="mode-briefing" onclick="setMode('briefing')">BRIEFING</button>
   </div>
 </header>
 
@@ -33,10 +33,10 @@
 
 <main>
 
+<!-- OVERVIEW -->
 <section id="overview" class="tab active">
   <div class="card hero">
     <div class="status">HIGH</div>
-
     <div class="bar"><div class="fill"></div></div>
 
     <div class="stats">
@@ -50,6 +50,7 @@
   </div>
 </section>
 
+<!-- MAP -->
 <section id="map" class="tab">
   <div class="card">
     <h3>Global Operational Map</h3>
@@ -57,8 +58,8 @@
   </div>
 </section>
 
+<!-- DRIVERS -->
 <section id="drivers" class="tab">
-
   <div class="card driver">
     <h3>Military Posture</h3>
     <p class="summary">Impact: +0.12 · Confidence: 0.81</p>
@@ -66,7 +67,7 @@
     <div class="details">
       <ul class="events"></ul>
       <p class="why analysis">
-        Wzrost koncentracji wojsk i rotacji zwiększa gotowość operacyjną.
+        Koncentracja wojsk i rotacje zwiększają gotowość operacyjną.
       </p>
       <p class="why explain">
         Gdy wojsko się przemieszcza i ćwiczy, łatwiej podjąć szybkie działania.
@@ -81,16 +82,16 @@
     <div class="details">
       <ul class="events"></ul>
       <p class="why analysis">
-        Logistyka determinuje tempo i czas trwania operacji.
+        Logistyka decyduje o tempie i czasie trwania operacji.
       </p>
       <p class="why explain">
         Bez paliwa i transportu wojsko nie może długo działać.
       </p>
     </div>
   </div>
-
 </section>
 
+<!-- TIMELINE -->
 <section id="timeline" class="tab">
   <div class="card">
     <h3>Escalation Timeline</h3>
@@ -99,8 +100,8 @@
   <div id="timelineNotes" class="card muted"></div>
 </section>
 
+<!-- SCENARIOS -->
 <section id="scenarios" class="tab">
-
   <div class="card red">
     <h3>Kinetic Escalation</h3>
     <p><b id="kinetic-pct">--%</b></p>
@@ -118,7 +119,6 @@
     <p><b id="deescalation-pct">--%</b></p>
     <div id="deescalation-why" class="muted"></div>
   </div>
-
 </section>
 
 </main>
