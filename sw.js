@@ -1,8 +1,10 @@
-const CACHE_NAME = "kassandra-v1";
+const CACHE_NAME = "kassandra-v2";
 const ASSETS = [
   "/Kasandra/",
   "/Kasandra/index.html",
-  "/Kasandra/manifest.json"
+  "/Kasandra/manifest.json",
+  "/Kasandra/icon-192.png",
+  "/Kasandra/icon-512.png"
 ];
 
 self.addEventListener("install", e => {
