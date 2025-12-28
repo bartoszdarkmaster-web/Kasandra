@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KASSANDRA v5.0 – Strategic Early Warning System</title>
+<title>KASSANDRA v5.1 – Strategic Early Warning System</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
@@ -21,7 +21,7 @@ button:hover{background:#374151}
 .meta{display:flex;gap:12px;flex-wrap:wrap;font-size:14px}
 .impact-item{border-bottom:1px solid #1f2937;padding:8px 0;cursor:pointer}
 .impact-details{display:none;font-size:13px;color:#9ca3af;margin-left:60px}
-#map{height:420px;border-radius:12px}
+#map{height:450px;border-radius:12px}
 #legend,#layers{position:absolute;right:10px;background:#0c1225;padding:8px;border-radius:8px;font-size:12px;z-index:1000}
 #legend{bottom:10px}
 #layers{top:10px}
@@ -42,13 +42,10 @@ button:hover{background:#374151}
   <div class="scale"><div class="marker" id="riskMarker"></div></div>
   <div class="meta">
     <div>CEPI: <b id="cepi">0.00</b></div>
-    <div>Trend 7d: <b id="trend">+0.00</b></div>
     <div>Confidence: <b id="conf">0%</b></div>
   </div>
   <br>
   <button onclick="updateNow()">UPDATE NOW</button>
-  <button onclick="saveSnapshot()">ZAPISZ SNAPSHOT</button>
-  <input type="file" accept=".csv" onchange="importCSV(this)">
 </div>
 
 <!-- DLACZEGO -->
@@ -58,7 +55,7 @@ button:hover{background:#374151}
 </div>
 
 <!-- MAPA -->
-<div class="card">
+<div class="card" style="position:relative">
 <div id="map"></div>
 
 <div id="layers">
@@ -75,112 +72,115 @@ button:hover{background:#374151}
 </div>
 </div>
 
-<!-- SNAPSHOTY -->
-<div class="card">
-<h3>SNAPSHOTY</h3>
-<ul id="snapshots"></ul>
-</div>
-
 </main>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-/* ===== DANE ===== */
+/* ===== DANE TESTOWE (Z PUNKTAMI) ===== */
 let events = [
-{title:"Koncentracja wojsk",category:"military",delta:0.04,confidence:0.88,lat:53.9,lon:27.56,sources:["Satellite"]},
+{title:"Koncentracja wojsk",category:"military",delta:0.04,confidence:0.88,lat:53.9,lon:27.56,sources:["Satellite imagery"]},
 {title:"Transporty paliwa",category:"logistics",delta:0.03,confidence:0.82,lat:47.9,lon:37.8,sources:["Rail OSINT"]},
-{title:"Szpital polowy",category:"medical",delta:0.02,confidence:0.8,lat:51.5,lon:31.3,sources:["Medical OSINT"]}
+{title:"Szpital polowy",category:"medical",delta:0.02,confidence:0.80,lat:51.5,lon:31.3,sources:["Medical OSINT"]}
 ];
 
-let snapshots=[];
 const weights={military:0.2,logistics:0.25,medical:0.2};
 
 /* ===== MAPA ===== */
-const map=L.map("map").setView([20,0],2);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:6}).addTo(map);
+const map = L.map("map").setView([20,0],2);
 
-const layers={
-military:L.layerGroup().addTo(map),
-logistics:L.layerGroup().addTo(map),
-medical:L.layerGroup().addTo(map)
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  maxZoom:6,
+  attribution:"© OpenStreetMap"
+}).addTo(map);
+
+/* WARSTWY – JAWNIE DODANE */
+const layers = {
+  military: L.layerGroup().addTo(map),
+  logistics: L.layerGroup().addTo(map),
+  medical: L.layerGroup().addTo(map)
 };
 
-function color(c){
-return c==="military"?"#ef4444":c==="logistics"?"#f59e0b":"#22c55e";
+function color(cat){
+  return cat==="military"?"#ef4444":
+         cat==="logistics"?"#f59e0b":
+         "#22c55e";
 }
 
 /* ===== CEPI ===== */
 function calcCEPI(){
-let sum=0,conf=0;
-events.forEach(e=>{
-sum+=e.delta*(weights[e.category]||0.1)*e.confidence;
-conf+=e.confidence;
-});
-document.getElementById("cepi").innerText=sum.toFixed(2);
-document.getElementById("conf").innerText=((conf/events.length)*100).toFixed(0)+"%";
-document.getElementById("riskMarker").style.left=(sum*100)+"%";
-document.getElementById("riskLevel").innerText=sum>0.85?"CRITICAL":sum>0.7?"HIGH":sum>0.5?"ELEVATED":"LOW";
+  let sum=0,conf=0;
+  events.forEach(e=>{
+    sum+=e.delta*(weights[e.category]||0.1)*e.confidence;
+    conf+=e.confidence;
+  });
+  document.getElementById("cepi").innerText=sum.toFixed(2);
+  document.getElementById("conf").innerText=((conf/events.length)*100).toFixed(0)+"%";
+  document.getElementById("riskMarker").style.left=(sum*100)+"%";
+  document.getElementById("riskLevel").innerText =
+    sum>0.85?"CRITICAL":sum>0.7?"HIGH":sum>0.5?"ELEVATED":"LOW";
 }
 
 /* ===== DLACZEGO ===== */
 function renderImpact(){
-const c=document.getElementById("impactList");c.innerHTML="";
-events.forEach(e=>{
-const d=document.createElement("div");
-d.className="impact-item";
-d.innerHTML=`▲ ${e.delta} ${e.title}`;
-const det=document.createElement("div");
-det.className="impact-details";
-det.innerHTML=`Pewność: ${e.confidence*100}%<br>Źródła: ${e.sources.join(", ")}`;
-d.onclick=()=>det.style.display=det.style.display==="block"?"none":"block";
-d.appendChild(det);c.appendChild(d);
-});
+  const c=document.getElementById("impactList");
+  c.innerHTML="";
+  events.forEach(e=>{
+    const d=document.createElement("div");
+    d.className="impact-item";
+    d.innerHTML=`▲ ${e.delta} ${e.title}`;
+    const det=document.createElement("div");
+    det.className="impact-details";
+    det.innerHTML=`Pewność: ${e.confidence*100}%<br>Źródła: ${e.sources.join(", ")}`;
+    d.onclick=()=>det.style.display=det.style.display==="block"?"none":"block";
+    d.appendChild(det);
+    c.appendChild(d);
+  });
 }
 
-/* ===== MAPA ===== */
+/* ===== MAPA – RYSOWANIE PUNKTÓW ===== */
 function renderMap(){
-Object.values(layers).forEach(l=>l.clearLayers());
-events.forEach(e=>{
-const m=L.circleMarker([e.lat,e.lon],{radius:6+e.delta*100,color:color(e.category),fillOpacity:0.8});
-m.bindPopup(`<b>${e.title}</b><br>Δ ${e.delta}`);
-layers[e.category].addLayer(m);
-});
+  Object.values(layers).forEach(l=>l.clearLayers());
+
+  events.forEach(e=>{
+    if(!e.lat || !e.lon) return;
+
+    const m = L.circleMarker([e.lat,e.lon],{
+      radius: 8 + e.delta*120,
+      color: color(e.category),
+      fillColor: color(e.category),
+      fillOpacity: 0.85,
+      weight: 1
+    }).bindPopup(`
+      <b>${e.title}</b><br>
+      Wpływ: +${e.delta}<br>
+      Pewność: ${(e.confidence*100).toFixed(0)}%
+    `);
+
+    layers[e.category].addLayer(m);
+  });
+
+  /* MARKER TESTOWY – ZAWSZE WIDOCZNY */
+  L.marker([52,21]).addTo(map).bindPopup("TEST MARKER – mapa działa");
 }
 
-/* ===== SNAPSHOT ===== */
-function saveSnapshot(){
-snapshots.push({time:new Date().toISOString(),cepi:document.getElementById("cepi").innerText});
-renderSnapshots();
-}
-function renderSnapshots(){
-const s=document.getElementById("snapshots");s.innerHTML="";
-snapshots.forEach(sn=>{
-const li=document.createElement("li");
-li.innerText=`${sn.time} → CEPI ${sn.cepi}`;
-s.appendChild(li);
-});
+/* ===== TOGGLE WARSTW ===== */
+function toggleLayer(name, checkbox){
+  checkbox.checked ? map.addLayer(layers[name]) : map.removeLayer(layers[name]);
 }
 
-/* ===== UPDATE / CSV ===== */
-function updateNow(){calcCEPI();renderImpact();renderMap();}
-function importCSV(input){
-const r=new FileReader();
-r.onload=e=>{
-const lines=e.target.result.split("\n").slice(1);
-lines.forEach(l=>{
-const c=l.split(",");
-if(c.length>6){
-events.push({title:c[3],category:c[2],delta:+c[5],confidence:+c[6],lat:+c[7],lon:+c[8],sources:[c[10]]});
+/* ===== UPDATE ===== */
+function updateNow(){
+  calcCEPI();
+  renderImpact();
+  renderMap();
 }
-});
+
+/* INIT */
 updateNow();
-};
-r.readAsText(input.files[0]);
-}
 
-/* ===== INIT ===== */
-updateNow();
+/* FIX LEAFLET */
+setTimeout(()=>map.invalidateSize(),300);
 </script>
 
 </body>
