@@ -33,15 +33,14 @@
 
 <main>
 
-<!-- OVERVIEW -->
 <section id="overview" class="tab active">
   <div class="card hero">
-    <div class="status">HIGH</div>
+    <div class="status" id="statusLabel">HIGH</div>
     <div class="bar"><div class="fill"></div></div>
 
     <div class="stats">
       <div>CEPI: <b id="cepi">--</b></div>
-      <div>Trend 7d: ▲</div>
+      <div>Region: <b id="regionLabel">GLOBAL</b></div>
       <div>Confidence: <b>0.78</b></div>
       <div>Update: <b id="time">--:--</b></div>
     </div>
@@ -50,74 +49,46 @@
   </div>
 </section>
 
-<!-- MAP -->
 <section id="map" class="tab">
   <div class="card">
-    <h3>Global Operational Map</h3>
+    <h3>Region Focus</h3>
+    <select id="regionSelect" onchange="setRegion(this.value)">
+      <option value="GLOBAL">GLOBAL</option>
+      <option value="EUROPE">Europe</option>
+      <option value="MIDDLE_EAST">Middle East</option>
+      <option value="INDO_PACIFIC">Indo-Pacific</option>
+    </select>
     <div id="mapContainer"></div>
   </div>
 </section>
 
-<!-- DRIVERS -->
 <section id="drivers" class="tab">
-  <div class="card driver">
-    <h3>Military Posture</h3>
-    <p class="summary">Impact: +0.12 · Confidence: 0.81</p>
-    <button onclick="toggleDriver(this)">Rozwiń</button>
-    <div class="details">
-      <ul class="events"></ul>
-      <p class="why analysis">
-        Koncentracja wojsk i rotacje zwiększają gotowość operacyjną.
-      </p>
-      <p class="why explain">
-        Gdy wojsko się przemieszcza i ćwiczy, łatwiej podjąć szybkie działania.
-      </p>
-    </div>
-  </div>
-
-  <div class="card driver">
-    <h3>Logistics</h3>
-    <p class="summary">Impact: +0.08 · Confidence: 0.77</p>
-    <button onclick="toggleDriver(this)">Rozwiń</button>
-    <div class="details">
-      <ul class="events"></ul>
-      <p class="why analysis">
-        Logistyka decyduje o tempie i czasie trwania operacji.
-      </p>
-      <p class="why explain">
-        Bez paliwa i transportu wojsko nie może długo działać.
-      </p>
-    </div>
+  <div class="card">
+    <h3>Top Drivers (Region)</h3>
+    <ul id="driverList"></ul>
   </div>
 </section>
 
-<!-- TIMELINE -->
 <section id="timeline" class="tab">
   <div class="card">
-    <h3>Escalation Timeline</h3>
+    <h3>Historical CEPI (Offline)</h3>
     <canvas id="timelineCanvas" style="width:100%"></canvas>
   </div>
   <div id="timelineNotes" class="card muted"></div>
 </section>
 
-<!-- SCENARIOS -->
 <section id="scenarios" class="tab">
   <div class="card red">
     <h3>Kinetic Escalation</h3>
     <p><b id="kinetic-pct">--%</b></p>
-    <div id="kinetic-why" class="muted"></div>
   </div>
-
   <div class="card orange">
     <h3>Hybrid Pressure</h3>
     <p><b id="hybrid-pct">--%</b></p>
-    <div id="hybrid-why" class="muted"></div>
   </div>
-
   <div class="card green">
     <h3>De-escalation</h3>
     <p><b id="deescalation-pct">--%</b></p>
-    <div id="deescalation-why" class="muted"></div>
   </div>
 </section>
 
