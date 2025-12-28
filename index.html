@@ -1,240 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>KASSANDRA – Strategic Risk System</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KASSANDRA v5.0 – Strategic Early Warning System</title>
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-:root {
-  --bg: #0b0f17;
-  --card: #121826;
-  --accent: #ff3b3b;
-  --green: #2ecc71;
-  --yellow: #f1c40f;
-  --text: #e6e8ef;
-  --muted: #9aa4bf;
-}
-
-* { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #10162a, #05070d);
-  color: var(--text);
-}
-
-header {
-  padding: 20px;
-  border-bottom: 1px solid #1d2440;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
-.sub { color: var(--muted); font-size: 13px; }
-
-button {
-  background: #1b2340;
-  color: var(--text);
-  border: 1px solid #2a3570;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-button:hover { background: #243060; }
-
-main {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-.card {
-  background: linear-gradient(180deg, #141b2e, #0d1324);
-  border: 1px solid #1e2750;
-  border-radius: 14px;
-  padding: 16px;
-}
-
-.risk {
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.scale {
-  height: 12px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, var(--green), var(--yellow), var(--accent));
-  position: relative;
-  margin: 10px 0;
-}
-.marker {
-  position: absolute;
-  top: -4px;
-  width: 4px;
-  height: 20px;
-  background: #fff;
-}
-
-.meta {
-  display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 10px;
-  margin-top: 10px;
-}
-.meta div {
-  background: #0c1225;
-  padding: 8px;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 12px;
-}
-
-.drivers li {
-  list-style: none;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-}
-.up { color: var(--accent); }
-.down { color: var(--green); }
-
-#map {
-  height: 260px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-canvas { width: 100%; height: 200px; }
-
-footer {
-  text-align: center;
-  padding: 10px;
-  font-size: 11px;
-  color: var(--muted);
-}
+body{margin:0;background:#0b0f17;color:#e5e7eb;font-family:system-ui}
+header{padding:16px;border-bottom:1px solid #1f2937}
+h1{margin:0;font-size:20px}
+main{padding:16px;max-width:1100px;margin:auto}
+.card{background:#121826;border:1px solid #1f2937;border-radius:14px;padding:16px;margin-bottom:16px}
+.risk{font-size:42px;font-weight:800;color:#ef4444}
+.scale{height:10px;border-radius:6px;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);margin:10px 0;position:relative}
+.marker{position:absolute;top:-4px;width:4px;height:18px;background:#fff}
+button{background:#1f2937;color:#e5e7eb;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+button:hover{background:#374151}
+.meta{display:flex;gap:12px;flex-wrap:wrap;font-size:14px}
+.impact-item{border-bottom:1px solid #1f2937;padding:8px 0;cursor:pointer}
+.impact-details{display:none;font-size:13px;color:#9ca3af;margin-left:60px}
+#map{height:420px;border-radius:12px}
+#legend,#layers{position:absolute;right:10px;background:#0c1225;padding:8px;border-radius:8px;font-size:12px;z-index:1000}
+#legend{bottom:10px}
+#layers{top:10px}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div>
-    <h1>KASSANDRA</h1>
-    <div class="sub" id="subtitle">Strategiczna Ocena Ryzyka</div>
-  </div>
-  <div>
-    <button onclick="toggleLang()">🇵🇱 / 🇬🇧</button>
-    <button onclick="updateNow()">UPDATE NOW</button>
-  </div>
+<h1>KASSANDRA – Strategic Early Warning System</h1>
 </header>
 
 <main>
 
-<!-- RISK -->
+<!-- DECISION MODE -->
 <div class="card">
-  <div class="risk" id="riskLabel">HIGH</div>
-  <div class="scale">
-    <div class="marker" id="marker" style="left:78%"></div>
-  </div>
-  <p id="riskDesc">
-    Presja eskalacyjna rośnie z powodu zaplecza logistycznego i infrastruktury medycznej.
-  </p>
-
+  <div class="risk" id="riskLevel">HIGH</div>
+  <div class="scale"><div class="marker" id="riskMarker"></div></div>
   <div class="meta">
-    <div>CEPI<br><b id="cepi">0.78</b></div>
-    <div>Δ 7d<br><b class="up">+0.08</b></div>
-    <div>Confidence<br><b>0.78</b></div>
-    <div>Update<br><b id="time">--:--</b></div>
+    <div>CEPI: <b id="cepi">0.00</b></div>
+    <div>Trend 7d: <b id="trend">+0.00</b></div>
+    <div>Confidence: <b id="conf">0%</b></div>
   </div>
+  <br>
+  <button onclick="updateNow()">UPDATE NOW</button>
+  <button onclick="saveSnapshot()">ZAPISZ SNAPSHOT</button>
+  <input type="file" accept=".csv" onchange="importCSV(this)">
 </div>
 
-<!-- DRIVERS -->
+<!-- DLACZEGO -->
 <div class="card">
-  <h3>Key Drivers</h3>
-  <ul class="drivers">
-    <li><span>🛢 Logistyka paliw</span><span class="up">▲ +0.03</span></li>
-    <li><span>🏥 Szpitale polowe</span><span class="up">▲ +0.02</span></li>
-    <li><span>📡 Operacje informacyjne</span><span class="up">▲ +0.01</span></li>
-    <li><span>🪖 Mobilizacja wojsk</span><span class="down">▼ -0.01</span></li>
-  </ul>
+<h3>CO WPŁYNĘŁO NA OCENĘ</h3>
+<div id="impactList"></div>
 </div>
 
-<!-- MAP -->
+<!-- MAPA -->
 <div class="card">
-  <h3>Operational Map</h3>
-  <div id="map"></div>
+<div id="map"></div>
+
+<div id="layers">
+<label><input type="checkbox" checked onchange="toggleLayer('military',this)"> Wojsko</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('logistics',this)"> Logistyka</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('medical',this)"> Medyczne</label>
 </div>
 
-<!-- TREND -->
+<div id="legend">
+<b>Legenda</b><br>
+<span style="color:#ef4444">●</span> Wojsko<br>
+<span style="color:#f59e0b">●</span> Logistyka<br>
+<span style="color:#22c55e">●</span> Medyczne
+</div>
+</div>
+
+<!-- SNAPSHOTY -->
 <div class="card">
-  <h3>Escalation Trend (7d)</h3>
-  <canvas id="trend"></canvas>
+<h3>SNAPSHOTY</h3>
+<ul id="snapshots"></ul>
 </div>
 
 </main>
 
-<footer>
-  Internal analytical system · KASSANDRA
-</footer>
-
-<!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-let lang = "pl";
+/* ===== DANE ===== */
+let events = [
+{title:"Koncentracja wojsk",category:"military",delta:0.04,confidence:0.88,lat:53.9,lon:27.56,sources:["Satellite"]},
+{title:"Transporty paliwa",category:"logistics",delta:0.03,confidence:0.82,lat:47.9,lon:37.8,sources:["Rail OSINT"]},
+{title:"Szpital polowy",category:"medical",delta:0.02,confidence:0.8,lat:51.5,lon:31.3,sources:["Medical OSINT"]}
+];
 
-const texts = {
-  pl: {
-    subtitle: "Strategiczna Ocena Ryzyka",
-    desc: "Presja eskalacyjna rośnie z powodu zaplecza logistycznego i infrastruktury medycznej."
-  },
-  en: {
-    subtitle: "Strategic Risk Assessment",
-    desc: "Escalation pressure increases due to logistics buildup and medical infrastructure."
-  }
+let snapshots=[];
+const weights={military:0.2,logistics:0.25,medical:0.2};
+
+/* ===== MAPA ===== */
+const map=L.map("map").setView([20,0],2);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:6}).addTo(map);
+
+const layers={
+military:L.layerGroup().addTo(map),
+logistics:L.layerGroup().addTo(map),
+medical:L.layerGroup().addTo(map)
 };
 
-function toggleLang(){
-  lang = lang === "pl" ? "en" : "pl";
-  document.getElementById("subtitle").innerText = texts[lang].subtitle;
-  document.getElementById("riskDesc").innerText = texts[lang].desc;
+function color(c){
+return c==="military"?"#ef4444":c==="logistics"?"#f59e0b":"#22c55e";
 }
 
-function updateNow(){
-  const v = (Math.random()*0.1+0.7).toFixed(2);
-  document.getElementById("cepi").innerText = v;
-  document.getElementById("marker").style.left = (v*100)+"%";
-  document.getElementById("time").innerText = new Date().toLocaleTimeString();
-}
-
-document.getElementById("time").innerText = new Date().toLocaleTimeString();
-
-/* MAP */
-const map = L.map('map').setView([50.45,30.52],6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-L.marker([50.45,30.52]).addTo(map).bindPopup("Logistyka / Medyczne");
-
-/* CHART */
-new Chart(document.getElementById("trend"),{
-  type:"line",
-  data:{
-    labels:["-7","-6","-5","-4","-3","-2","-1"],
-    datasets:[{
-      data:[0.42,0.44,0.47,0.5,0.54,0.58,0.62],
-      borderColor:"#ff3b3b",
-      tension:0.4
-    }]
-  },
-  options:{plugins:{legend:{display:false}}}
+/* ===== CEPI ===== */
+function calcCEPI(){
+let sum=0,conf=0;
+events.forEach(e=>{
+sum+=e.delta*(weights[e.category]||0.1)*e.confidence;
+conf+=e.confidence;
 });
+document.getElementById("cepi").innerText=sum.toFixed(2);
+document.getElementById("conf").innerText=((conf/events.length)*100).toFixed(0)+"%";
+document.getElementById("riskMarker").style.left=(sum*100)+"%";
+document.getElementById("riskLevel").innerText=sum>0.85?"CRITICAL":sum>0.7?"HIGH":sum>0.5?"ELEVATED":"LOW";
+}
+
+/* ===== DLACZEGO ===== */
+function renderImpact(){
+const c=document.getElementById("impactList");c.innerHTML="";
+events.forEach(e=>{
+const d=document.createElement("div");
+d.className="impact-item";
+d.innerHTML=`▲ ${e.delta} ${e.title}`;
+const det=document.createElement("div");
+det.className="impact-details";
+det.innerHTML=`Pewność: ${e.confidence*100}%<br>Źródła: ${e.sources.join(", ")}`;
+d.onclick=()=>det.style.display=det.style.display==="block"?"none":"block";
+d.appendChild(det);c.appendChild(d);
+});
+}
+
+/* ===== MAPA ===== */
+function renderMap(){
+Object.values(layers).forEach(l=>l.clearLayers());
+events.forEach(e=>{
+const m=L.circleMarker([e.lat,e.lon],{radius:6+e.delta*100,color:color(e.category),fillOpacity:0.8});
+m.bindPopup(`<b>${e.title}</b><br>Δ ${e.delta}`);
+layers[e.category].addLayer(m);
+});
+}
+
+/* ===== SNAPSHOT ===== */
+function saveSnapshot(){
+snapshots.push({time:new Date().toISOString(),cepi:document.getElementById("cepi").innerText});
+renderSnapshots();
+}
+function renderSnapshots(){
+const s=document.getElementById("snapshots");s.innerHTML="";
+snapshots.forEach(sn=>{
+const li=document.createElement("li");
+li.innerText=`${sn.time} → CEPI ${sn.cepi}`;
+s.appendChild(li);
+});
+}
+
+/* ===== UPDATE / CSV ===== */
+function updateNow(){calcCEPI();renderImpact();renderMap();}
+function importCSV(input){
+const r=new FileReader();
+r.onload=e=>{
+const lines=e.target.result.split("\n").slice(1);
+lines.forEach(l=>{
+const c=l.split(",");
+if(c.length>6){
+events.push({title:c[3],category:c[2],delta:+c[5],confidence:+c[6],lat:+c[7],lon:+c[8],sources:[c[10]]});
+}
+});
+updateNow();
+};
+r.readAsText(input.files[0]);
+}
+
+/* ===== INIT ===== */
+updateNow();
 </script>
 
 </body>
