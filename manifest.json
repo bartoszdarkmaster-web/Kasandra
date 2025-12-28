@@ -1,7 +1,8 @@
 {
   "name": "Kassandra",
   "short_name": "Kassandra",
-  "start_url": "/Kasandra/",
+  "start_url": "/Kasandra/index.html",
+  "scope": "/Kasandra/",
   "display": "standalone",
   "background_color": "#0b0f14",
   "theme_color": "#0b0f14",
@@ -9,12 +10,12 @@
   "description": "Strategiczny system wczesnego ostrzegania – Kasandra",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/Kasandra/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "/Kasandra/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
