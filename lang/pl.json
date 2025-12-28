@@ -1,0 +1,23 @@
+{
+  "overview": "OVERVIEW",
+  "map": "MAPA",
+  "drivers": "CZYNNIKI",
+  "timeline": "OŚ CZASU",
+  "scenarios": "SCENARIUSZE",
+
+  "status_high": "WYSOKIE RYZYKO",
+  "update_now": "AKTUALIZUJ",
+
+  "key_changes": "Kluczowe zmiany (7 dni)",
+  "attention_points": "Punkty wymagające uwagi",
+
+  "military": "Koncentracja wojsk",
+  "logistics": "Logistyka paliw i amunicji",
+  "medical": "Infrastruktura medyczna",
+  "information": "Domena informacyjna",
+
+  "global_map": "Globalna mapa operacyjna",
+  "drivers_title": "Czynniki eskalacyjne",
+  "timeline_title": "Trend eskalacji",
+  "scenarios_title": "Scenariusze"
+}
