@@ -3,9 +3,22 @@
 <head>
   <meta charset="utf-8">
   <title>Kassandra</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0f14">
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
+
+  <!-- Leaflet (mapa) -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <!-- Chart.js (wykresy) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root{
@@ -13,133 +26,154 @@
       --panel:#121826;
       --accent:#00ffcc;
       --danger:#ff3b3b;
+      --warn:#ffaa00;
       --text:#e6edf3;
       --muted:#8b949e;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
       background:var(--bg);
       color:var(--text);
     }
+
     header{
-      padding:16px;
-      border-bottom:1px solid #1f2636;
+      padding:14px;
       display:flex;
-      align-items:center;
       justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid #1f2636;
     }
+
     h1{
+      font-size:16px;
       margin:0;
-      font-size:18px;
       letter-spacing:.5px;
     }
+
     button{
       background:var(--accent);
-      color:#000;
       border:none;
-      padding:8px 14px;
-      font-weight:600;
+      padding:6px 12px;
       border-radius:6px;
+      font-weight:700;
+      cursor:pointer;
     }
+
     main{
-      padding:16px;
+      padding:14px;
       display:grid;
-      grid-template-columns:1fr;
-      gap:16px;
+      gap:14px;
     }
+
     .grid{
       display:grid;
+      gap:14px;
       grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:16px;
     }
+
     .card{
       background:var(--panel);
-      padding:14px;
-      border-radius:10px;
       border:1px solid #1f2636;
+      border-radius:10px;
+      padding:12px;
     }
+
     .card h2{
-      margin:0 0 8px 0;
-      font-size:14px;
+      font-size:13px;
       color:var(--muted);
+      margin:0 0 6px;
     }
+
     .value{
       font-size:26px;
-      font-weight:700;
+      font-weight:800;
     }
-    .danger{color:var(--danger)}
-    .accent{color:var(--accent)}
+
     .small{
-      font-size:12px;
-      color:var(--muted);
-    }
-    footer{
-      padding:12px;
-      text-align:center;
       font-size:11px;
       color:var(--muted);
+    }
+
+    .danger{color:var(--danger)}
+    .warn{color:var(--warn)}
+    .accent{color:var(--accent)}
+
+    footer{
+      text-align:center;
+      padding:10px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .lang{
+      cursor:pointer;
+      margin-left:6px;
+      font-size:18px;
     }
   </style>
 </head>
 
 <body>
+
 <header>
-  <h1>KASSANDRA · Strategic Early Warning</h1>
-  <button onclick="updateData()">UPDATE</button>
+  <h1 id="title">KASSANDRA · Strategic Early Warning</h1>
+  <div>
+    <span class="lang" onclick="setLang('pl')">🇵🇱</span>
+    <span class="lang" onclick="setLang('en')">🇬🇧</span>
+    <button onclick="updateData()">UPDATE</button>
+  </div>
 </header>
 
 <main>
 
-  <!-- GLOBAL STATUS -->
+  <!-- STATUS GLOBALNY -->
   <section class="grid">
     <div class="card">
-      <h2>Global Threat Level</h2>
-      <div id="threat" class="value danger">HIGH</div>
-      <div class="small">Composite risk score</div>
+      <h2 id="t_threat">Global Threat Level</h2>
+      <div class="value danger" id="threat">HIGH</div>
     </div>
 
     <div class="card">
-      <h2>Confidence Index</h2>
-      <div id="confidence" class="value accent">0.74</div>
-      <div class="small">Data reliability</div>
+      <h2 id="t_conf">Confidence</h2>
+      <div class="value accent" id="confidence">0.74</div>
     </div>
 
     <div class="card">
-      <h2>Last Update</h2>
-      <div id="lastUpdate" class="value">—</div>
-      <div class="small">UTC</div>
+      <h2 id="t_time">Last update</h2>
+      <div class="value" id="time">—</div>
     </div>
   </section>
 
-  <!-- VARIABLES -->
+  <!-- MAPA OPERACYJNA -->
   <section class="card">
-    <h2>Key Variables (weights)</h2>
-    <ul class="small">
-      <li>Troop movements — 0.30</li>
-      <li>Logistics & fuel — 0.20</li>
-      <li>Hospitals / bunkers — 0.15</li>
-      <li>Ammo depots — 0.15</li>
-      <li>Political signaling — 0.10</li>
-      <li>Information warfare — 0.10</li>
-    </ul>
-  </section>
-
-  <!-- MAP PLACEHOLDER -->
-  <section class="card">
-    <h2>Operational Map</h2>
-    <div class="small">[ map module placeholder — satellite / OSINT layers ]</div>
-  </section>
-
-  <!-- TIMELINE -->
-  <section class="card">
-    <h2>Timeline</h2>
+    <h2 id="t_map">Operational Map</h2>
+    <div id="map" style="height:300px;border-radius:8px;"></div>
     <div class="small">
-      • T-30: increased logistics activity<br>
-      • T-14: hospital capacity expansion<br>
-      • T-7: fuel depot reinforcement
+      Troops · Logistics · Hospitals · Ammo
     </div>
+  </section>
+
+  <!-- WYKRES -->
+  <section class="card">
+    <h2 id="t_chart">Escalation Trend</h2>
+    <canvas id="chart"></canvas>
+  </section>
+
+  <!-- WYJAŚNIENIE -->
+  <section class="card">
+    <h2 id="t_explain">Why HIGH?</h2>
+    <ul class="small">
+      <li>Troop movements ↑ (0.30)</li>
+      <li>Fuel & logistics ↑ (0.20)</li>
+      <li>Hospital expansion ↑ (0.15)</li>
+      <li>Ammo storage ↑ (0.15)</li>
+      <li>Information warfare ↑ (0.10)</li>
+      <li>Political signaling ↑ (0.10)</li>
+    </ul>
   </section>
 
 </main>
@@ -149,19 +183,87 @@
 </footer>
 
 <script>
-  function updateData(){
-    const now = new Date().toISOString();
-    document.getElementById("lastUpdate").innerText = now.slice(11,19);
-    document.getElementById("confidence").innerText =
-      (0.65 + Math.random()*0.2).toFixed(2);
+/* ===== JĘZYKI ===== */
+const dict={
+  pl:{
+    title:"KASSANDRA · System Wczesnego Ostrzegania",
+    threat:"Poziom zagrożenia",
+    conf:"Pewność danych",
+    time:"Ostatnia aktualizacja",
+    map:"Mapa operacyjna",
+    chart:"Trend eskalacji",
+    explain:"Dlaczego HIGH?"
+  },
+  en:{
+    title:"KASSANDRA · Strategic Early Warning",
+    threat:"Global Threat Level",
+    conf:"Confidence",
+    time:"Last update",
+    map:"Operational Map",
+    chart:"Escalation Trend",
+    explain:"Why HIGH?"
   }
+};
 
-  // initial load
-  updateData();
+function setLang(l){
+  document.getElementById("title").innerText=dict[l].title;
+  document.getElementById("t_threat").innerText=dict[l].threat;
+  document.getElementById("t_conf").innerText=dict[l].conf;
+  document.getElementById("t_time").innerText=dict[l].time;
+  document.getElementById("t_map").innerText=dict[l].map;
+  document.getElementById("t_chart").innerText=dict[l].chart;
+  document.getElementById("t_explain").innerText=dict[l].explain;
+}
 
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/Kasandra/sw.js");
+/* ===== UPDATE ===== */
+function updateData(){
+  document.getElementById("confidence").innerText =
+    (0.65 + Math.random()*0.25).toFixed(2);
+  document.getElementById("time").innerText =
+    new Date().toISOString().slice(11,19);
+}
+updateData();
+
+/* ===== MAPA ===== */
+const map=L.map("map").setView([50.5,30.5],6);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:18}).addTo(map);
+
+[
+  {c:[52.2,21.0],t:"Troops",col:"#ff3b3b"},
+  {c:[50.3,23.0],t:"Fuel depot",col:"#ffaa00"},
+  {c:[49.8,24.0],t:"Hospital",col:"#ffaa00"},
+  {c:[53.0,27.5],t:"Ammo storage",col:"#ff3b3b"}
+].forEach(p=>{
+  L.circleMarker(p.c,{
+    radius:8,
+    color:p.col,
+    fillOpacity:.8
+  }).addTo(map).bindPopup(p.t);
+});
+
+/* ===== WYKRES ===== */
+new Chart(document.getElementById("chart"),{
+  type:"line",
+  data:{
+    labels:["-7","-6","-5","-4","-3","-2","-1","Now"],
+    datasets:[{
+      data:[0.42,0.45,0.5,0.56,0.63,0.71,0.78,0.84],
+      borderColor:"#ff3b3b",
+      tension:.4
+    }]
+  },
+  options:{
+    plugins:{legend:{display:false}},
+    scales:{y:{min:0,max:1}}
   }
+});
+
+/* ===== SERVICE WORKER ===== */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/Kasandra/sw.js");
+}
 </script>
+
 </body>
 </html>
