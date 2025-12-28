@@ -1,37 +1,45 @@
-const reasonsData = [
-  { text: "Koncentracja wojsk (satellite)", impact: "+0.12" },
-  { text: "Rozbudowa magazynów paliw", impact: "+0.08" },
-  { text: "Szpitale polowe – nowe lokalizacje", impact: "+0.06" },
-  { text: "Brak mobilizacji powszechnej", impact: "-0.04" }
-];
+/* =======================
+   TAB NAVIGATION
+======================= */
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
 
-function updateSystem() {
+  document.getElementById(id).classList.add("active");
+  event.target.classList.add("active");
+
+  if (id === "map" && window.map) {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
+  }
+}
+
+/* =======================
+   UPDATE TIME
+======================= */
+function update() {
   document.getElementById("time").innerText =
     new Date().toLocaleTimeString();
 }
 
-const reasonsList = document.getElementById("reasons");
-reasonsData.forEach(r => {
-  const li = document.createElement("li");
-  li.innerText = `${r.text} (${r.impact})`;
-  reasonsList.appendChild(li);
-});
+/* =======================
+   MAP INITIALIZATION
+======================= */
+const map = L.map("mapContainer").setView([40, 20], 2);
 
-// MAPA
-const map = L.map('map').setView([50, 30], 4);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap'
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap"
 }).addTo(map);
 
-// Punkty zdarzeń
-const points = [
-  { lat: 50.45, lon: 30.52, label: "Koncentracja wojsk" },
-  { lat: 53.9, lon: 27.56, label: "Zaplecze logistyczne" },
-  { lat: 55.75, lon: 37.61, label: "Centrum dowodzenia" }
+/* ===== MAP POINTS ===== */
+const mapPoints = [
+  { lat: 52, lon: 27, label: "Logistics surge – Eastern Europe" },
+  { lat: 55, lon: 37, label: "Command & control node" },
+  { lat: 35, lon: 36, label: "Force posture shift – Middle East" }
 ];
 
-points.forEach(p => {
+mapPoints.forEach(p => {
   L.circleMarker([p.lat, p.lon], {
     radius: 8,
     color: "#ff4d4d",
@@ -39,5 +47,41 @@ points.forEach(p => {
   }).addTo(map).bindPopup(p.label);
 });
 
-// Auto update
-updateSystem();
+/* =======================
+   LANGUAGE SYSTEM (PL / EN)
+======================= */
+let currentLang = localStorage.getItem("lang") || "pl";
+let translations = {};
+
+async function loadLang(lang) {
+  try {
+    const res = await fetch(`lang/${lang}.json`);
+    translations = await res.json();
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (translations[key]) {
+        el.innerText = translations[key];
+      }
+    });
+
+    localStorage.setItem("lang", lang);
+    currentLang = lang;
+  } catch (e) {
+    console.warn("Language load error:", e);
+  }
+}
+
+function setLang(lang) {
+  loadLang(lang);
+}
+
+/* =======================
+   INIT
+======================= */
+update();
+loadLang(currentLang);
+
+setTimeout(() => {
+  map.invalidateSize();
+}, 400);
