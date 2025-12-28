@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>KASSANDRA – Global Strategic Early Warning</title>
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
@@ -18,21 +16,24 @@
 <header class="top">
   <h1>KASSANDRA</h1>
   <p>Global Strategic Early Warning System</p>
+
+  <div class="lang-switch">
+    <button onclick="setLang('pl')">🇵🇱</button>
+    <button onclick="setLang('en')">🇬🇧</button>
+  </div>
 </header>
 
 <nav class="tabs">
-  <button onclick="showTab('overview')" class="active">OVERVIEW</button>
-  <button onclick="showTab('map')">MAP</button>
-  <button onclick="showTab('drivers')">DRIVERS</button>
-  <button onclick="showTab('timeline')">TIMELINE</button>
-  <button onclick="showTab('scenarios')">SCENARIOS</button>
+  <button class="active" onclick="showTab('overview')" data-i18n="overview">OVERVIEW</button>
+  <button onclick="showTab('map')" data-i18n="map">MAP</button>
+  <button onclick="showTab('drivers')" data-i18n="drivers">DRIVERS</button>
+  <button onclick="showTab('timeline')" data-i18n="timeline">TIMELINE</button>
+  <button onclick="showTab('scenarios')" data-i18n="scenarios">SCENARIOS</button>
 </nav>
 
 <main>
 
-<!-- ================= OVERVIEW ================= -->
 <section id="overview" class="tab active">
-
   <div class="card hero">
     <div class="status">HIGH</div>
 
@@ -41,101 +42,89 @@
     </div>
 
     <div class="stats">
-      <div>CEPI: <b>0.78</b></div>
-      <div>Δ 7d: <span class="up">+0.08 ▲</span></div>
+      <div>CEPI: <b id="cepi">--</b></div>
+      <div>Δ 7d: <span class="up">▲</span></div>
       <div>Confidence: <b>0.78</b></div>
       <div>Update: <b id="time">--:--</b></div>
     </div>
 
-    <button onclick="update()">UPDATE NOW</button>
+    <button onclick="updateSystem()" data-i18n="update_now">UPDATE NOW</button>
   </div>
 
   <div class="card">
-    <h3>Kluczowe zmiany (7 dni)</h3>
+    <h3 data-i18n="key_changes">Kluczowe zmiany (7 dni)</h3>
     <ul>
-      <li>↑ Military concentration (Eurasia)</li>
-      <li>↑ Fuel & ammo logistics</li>
-      <li>↑ Medical infrastructure</li>
-      <li>↓ No mass mobilization detected</li>
+      <li>↑ Military concentration</li>
+      <li>↑ Logistics activity</li>
+      <li>↑ Medical readiness</li>
+      <li>↓ No mass mobilization</li>
     </ul>
   </div>
 
   <div class="card">
-    <h3>Global Attention Points</h3>
+    <h3 data-i18n="attention_points">Punkty wymagające uwagi</h3>
     <ul>
       <li>⚠ Eastern Europe – logistics surge</li>
       <li>⚠ Middle East – force posture shift</li>
       <li>ℹ Indo-Pacific – stable</li>
     </ul>
   </div>
-
 </section>
 
-<!-- ================= MAP ================= -->
 <section id="map" class="tab">
   <div class="card">
-    <h3>Global Operational Map</h3>
+    <h3 data-i18n="global_map">Globalna mapa operacyjna</h3>
     <div id="mapContainer"></div>
   </div>
 </section>
 
-<!-- ================= DRIVERS ================= -->
 <section id="drivers" class="tab">
-
   <div class="card">
     <h3>Military Posture</h3>
     <p>Trend: ↑ | Impact: +0.12 | Confidence: 0.81</p>
-    <p>Regions: Eastern Europe, Western Russia</p>
   </div>
 
   <div class="card">
-    <h3>Logistics & Fuel</h3>
+    <h3>Logistics</h3>
     <p>Trend: ↑ | Impact: +0.08 | Confidence: 0.77</p>
-    <p>Rail traffic, fuel depots, transport intensity</p>
   </div>
 
   <div class="card">
     <h3>Medical & Civil Defense</h3>
     <p>Trend: ↑ | Impact: +0.06 | Confidence: 0.74</p>
-    <p>Field hospitals, evacuation readiness</p>
   </div>
 
   <div class="card">
     <h3>Information Domain</h3>
     <p>Trend: → | Impact: +0.02 | Confidence: 0.69</p>
-    <p>Rhetoric, narratives, internal signaling</p>
   </div>
-
 </section>
 
-<!-- ================= TIMELINE ================= -->
 <section id="timeline" class="tab">
   <div class="card">
-    <h3>Escalation Timeline</h3>
-    <p>CEPI trend over time (7 / 30 / 90 days)</p>
-    <p>[ tutaj wykres ]</p>
+    <h3 data-i18n="timeline_title">Escalation Timeline</h3>
+    <canvas id="timelineCanvas" style="width:100%"></canvas>
   </div>
 </section>
 
-<!-- ================= SCENARIOS ================= -->
 <section id="scenarios" class="tab">
 
   <div class="card red">
     <h3>Kinetic Escalation</h3>
-    <p>Probability: 22%</p>
-    <p>Triggers: mobilization, air posture change</p>
+    <p><b id="kinetic-pct">--%</b></p>
+    <div id="kinetic-why" class="muted"></div>
   </div>
 
   <div class="card orange">
     <h3>Hybrid Pressure</h3>
-    <p>Probability: 46%</p>
-    <p>Logistics + information operations</p>
+    <p><b id="hybrid-pct">--%</b></p>
+    <div id="hybrid-why" class="muted"></div>
   </div>
 
   <div class="card green">
     <h3>De-escalation</h3>
-    <p>Probability: 32%</p>
-    <p>Logistics slowdown, political signaling</p>
+    <p><b id="deescalation-pct">--%</b></p>
+    <div id="deescalation-why" class="muted"></div>
   </div>
 
 </section>
@@ -146,37 +135,6 @@
   Internal analytical system · KASSANDRA
 </footer>
 
-<script>
-function showTab(id) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
-}
-
-function update() {
-  document.getElementById('time').innerText =
-    new Date().toLocaleTimeString();
-}
-
-// MAP
-const map = L.map('mapContainer').setView([40, 20], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-[
-  {lat: 52, lon: 27, label: "Logistics surge"},
-  {lat: 55, lon: 37, label: "Command center"},
-  {lat: 35, lon: 36, label: "Force posture shift"}
-].forEach(p => {
-  L.circleMarker([p.lat, p.lon], {
-    radius: 8,
-    color: "#ff4d4d",
-    fillOpacity: 0.8
-  }).addTo(map).bindPopup(p.label);
-});
-
-update();
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
