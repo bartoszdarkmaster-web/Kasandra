@@ -1,23 +1,25 @@
 {
-  "name": "Kassandra",
-  "short_name": "Kassandra",
-  "start_url": "/Kasandra/index.html",
-  "scope": "/Kasandra/",
+  "name": "KASSANDRA – Strategic Early Warning System",
+  "short_name": "KASSANDRA",
+  "description": "Globalny system wczesnego ostrzegania oparty o OSINT, analizę trendów i CEPI.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0b0f14",
-  "theme_color": "#0b0f14",
   "orientation": "portrait",
-  "description": "Strategiczny system wczesnego ostrzegania – Kasandra",
+  "background_color": "#0b0f17",
+  "theme_color": "#ef4444",
   "icons": [
     {
-      "src": "/Kasandra/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/Kasandra/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
